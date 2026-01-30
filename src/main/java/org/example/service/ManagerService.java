@@ -1,90 +1,84 @@
 package org.example.service;
 
-import org.example.dao.EmployeeDAO;
-import org.example.dao.ManagerDao;
-import org.example.model.Employee;
+import org.example.DAO.ManagerDAO;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.Scanner;
-
+// Service layer handling all manager-related business operations
+// Acts as a bridge between ManagerController and ManagerDao
 public class ManagerService {
-    private final ManagerDao managerDao = new ManagerDao();
-    private final Scanner sc = new Scanner(System.in);
+    private static final Logger logger =
+            LogManager.getLogger(ManagerService.class);
+    // DAO responsible for all manager-specific database operations
+    private final ManagerDAO managerDao = new ManagerDAO();
 
-    private Employee employee;
-    public void menu(Employee employee) {
-
-        int managerId = employee.getId();
-        System.out.println("""
-        ===== MANAGER MENU =====
-        1. View Direct Reportees
-        2. View Team Leave Applications
-        3. Approve / Reject Leave Request
-        4. View Team Leave Calendar & Balances
-        5. Review Performance Documents
-        6. Provide Performance Feedback
-        7. Rate Employee Performance
-        8. Review Employee Goals
-        9. Track Team Goal Status
-        10. View Team Hierarchy
-        11. View Team Attendance Summary
-        12. Generate Team Performance Report
-        13. View Notifications
-        """);
-
-        int choice = Integer.parseInt(sc.nextLine());
-
-        switch (choice) {
-            case 1 -> managerDao.viewReportees(managerId);
-            case 2 -> managerDao.viewTeamLeaveRequests(managerId);
-            case 3 -> approveRejectLeave();
-            case 4 -> managerDao.viewTeamLeaveSummary(managerId);
-            case 5 -> managerDao.viewPerformanceDocs(managerId);
-            case 6 -> provideFeedback();
-            case 7 -> ratePerformance();
-            case 8 -> managerDao.viewEmployeeGoals(managerId);
-            case 9 -> managerDao.trackGoalStatus(managerId);
-            case 10 -> managerDao.viewTeamHierarchy(managerId);
-            case 11 -> managerDao.viewAttendanceSummary(managerId);
-            case 12 -> managerDao.generatePerformanceReport(managerId);
-            case 13 -> managerDao.viewNotifications(managerId);
-            default -> System.out.println("❌ Invalid option");
-        }
+    // Fetches and displays all direct reportees under the manager
+    public void viewReportees(int managerId) {
+        logger.info("Viewing reportees for managerId={}", managerId);
+        managerDao.viewReportees(managerId);
     }
 
-    private void approveRejectLeave() {
-        System.out.print("Leave Request ID: ");
-        int leaveId = Integer.parseInt(sc.nextLine());
-
-        System.out.print("Approve / Reject: ");
-        String status = sc.nextLine().toUpperCase();
-
-        System.out.print("Comments: ");
-        String comments = sc.nextLine();
-
-        boolean success = managerDao.updateLeaveStatus(leaveId, status, comments);
-        System.out.println(success ? "✅ Action completed" : "❌ Failed");
+    // Fetches and displays all leave requests from the manager's team
+    public void viewTeamLeaveRequests(int managerId) {
+        logger.info("Viewing team leave requests for managerId={}", managerId);
+        managerDao.viewTeamLeaveRequests(managerId);
     }
 
-    private void provideFeedback() {
-        System.out.print("Employee ID: ");
-        int empId = Integer.parseInt(sc.nextLine());
-
-        System.out.print("Feedback: ");
-        String feedback = sc.nextLine();
-
-        boolean success = managerDao.addFeedback(empId, feedback);
-        System.out.println(success ? "✅ Feedback submitted" : "❌ Failed");
+    // Approves or rejects a leave request with manager comments
+    public boolean updateLeaveStatus(int leaveId, String status, String comments) {
+        logger.info("Updating leave status: leaveId={}, status={}", leaveId, status);
+        return managerDao.updateLeaveStatus(leaveId, status, comments);
     }
 
-    private void ratePerformance() {
-        System.out.print("Employee ID: ");
-        int empId = Integer.parseInt(sc.nextLine());
+    // Displays leave balance summary for the manager’s team
+    public void viewTeamLeaveSummary(int managerId) {
+        logger.info("Viewing team leave summary for managerId={}", managerId);
+        managerDao.viewTeamLeaveSummary(managerId);
+    }
 
-        System.out.print("Rating (1–5): ");
-        int rating = Integer.parseInt(sc.nextLine());
+    // Displays performance-related documents of team members
+    public void viewPerformanceDocs(int managerId) {
+        logger.info("Viewing performance docs for managerId={}", managerId);
+        managerDao.viewPerformanceDocs(managerId);
+    }
 
-        boolean success = managerDao.rateEmployee(empId, rating);
-        System.out.println(success ? "✅ Rating submitted" : "❌ Failed");
+    // Adds qualitative feedback for an employee
+    public boolean addFeedback(int empId, String feedback) {
+        return managerDao.addFeedback(empId, feedback);
+    }
+
+    // Rates an employee’s performance numerically
+    public boolean rateEmployee(int empId, int rating) {
+        return managerDao.rateEmployee(empId, rating);
+    }
+
+    // Displays goals assigned to employees under the manager
+    public void viewEmployeeGoals(int managerId) {
+        managerDao.viewEmployeeGoals(managerId);
+    }
+
+    // Tracks current status of employee goals
+    public void trackGoalStatus(int managerId) {
+        managerDao.trackGoalStatus(managerId);
+    }
+
+    // Displays the hierarchical structure of the manager’s team
+    public void viewTeamHierarchy(int managerId) {
+        managerDao.viewTeamHierarchy(managerId);
+    }
+
+    // Displays attendance summary of all team members
+    public void viewAttendanceSummary(int managerId) {
+        managerDao.viewAttendanceSummary(managerId);
+    }
+
+    // Generates a consolidated performance report for the team
+    public void generatePerformanceReport(int managerId) {
+        managerDao.generatePerformanceReport(managerId);
+    }
+
+    // Displays notifications relevant to the manager
+    public void viewNotifications(int managerId) {
+        managerDao.viewNotifications(managerId);
     }
 }
-

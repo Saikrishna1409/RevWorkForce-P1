@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+    <!-- ===================== -->
+    <!-- PROPERTIES -->
+    <!-- ===================== -->
+    <Properties>
+        <!-- Log file location -->
+        <Property name="LOG_DIR">logs</Property>
+
+        <!-- Log format -->
+        <Property name="LOG_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %c{1} - %msg%n
+        </Property>
+    </Properties>
+
+    <!-- ===================== -->
+    <!-- APPENDERS -->
+    <!-- ===================== -->
+    <Appenders>
+
+        <!-- Console output (for development) -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}" />
+        </Console>
+
+        <!-- Rolling file appender -->
+        <RollingFile name="FileLogger"
+                     fileName="${LOG_DIR}/application.log"
+                     filePattern="${LOG_DIR}/application-%d{yyyy-MM-dd}.log">
+
+            <PatternLayout pattern="${LOG_PATTERN}" />
+
+            <!-- Rotate log file daily -->
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+
+        </RollingFile>
+
+    </Appenders>
+
+    <!-- ===================== -->
+    <!-- LOGGERS -->
+    <!-- ===================== -->
+    <Loggers>
+
+        <!-- Service layer logging -->
+        <Logger name="org.example.service" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Logger>
+
+        <!-- DAO layer logging -->
+        <Logger name="org.example.DAO" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Logger>
+
+        <!-- Utility classes logging -->
+        <Logger name="org.example.util" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Logger>
+
+        <!-- Controller layer logging -->
+        <Logger name="org.example.controller" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Logger>
+
+        <!-- Root logger (fallback) -->
+        <Root level="error">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Root>
+
+    </Loggers>
+
+</Configuration>

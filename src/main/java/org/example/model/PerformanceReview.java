@@ -5,7 +5,7 @@ public class PerformanceReview {
     private String deliverables;
     private String accomplishments;
     private int selfRating;
-
+//getters and setters written for this model
     public int getEmpId() {
         return empId;
     }

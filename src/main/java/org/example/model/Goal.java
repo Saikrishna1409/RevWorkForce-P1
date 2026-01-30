@@ -3,6 +3,7 @@ package org.example.model;
 import java.time.LocalDate;
 
 public class Goal {
+    //getters and setters written for this model
     private int goalId;
     private String description;
     private int progress;

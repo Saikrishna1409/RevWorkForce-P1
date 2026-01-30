@@ -3,6 +3,7 @@ package org.example.model;
 import java.time.LocalDate;
 
 public class Employee {
+    //getters and setters written for this model
     private int id;
     private String name;
     private String role;

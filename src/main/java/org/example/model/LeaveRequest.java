@@ -1,7 +1,7 @@
 package org.example.model;
 import java.time.LocalDate;
 public class LeaveRequest {
-
+    //getters and setters written for this model
     private int leaveId;
     private String type;
     private String status;

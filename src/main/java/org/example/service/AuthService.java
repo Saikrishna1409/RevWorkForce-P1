@@ -1,51 +1,67 @@
 package org.example.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.example.DAO.AuthDAO;
+import org.example.exception.BusinessException;
 import org.example.model.Employee;
-import org.example.util.DBUtil;
-import java.sql.*;
+import java.sql.SQLException;
 
+// Service layer responsible for authentication-related business logic
+// Acts as an intermediary between Controller and AuthDAO
 public class AuthService {
+    private static final Logger logger =
+            LogManager.getLogger(AuthService.class);
 
-    public Employee login(int empId, String pwd) {
-        String sql = "SELECT * FROM employees WHERE emp_id=? AND password=? AND active=1";
-        try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+    // DAO object used to interact with authentication-related database operations
+    private final AuthDAO authDAO = new AuthDAO();
 
-            ps.setInt(1, empId);
-            ps.setString(2, pwd);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return new Employee(
-                        rs.getInt("emp_id"),
-                        rs.getString("name"),
-                        rs.getString("role"),
-                        rs.getInt("manager_id")
-                );
+    // Handles employee login logic
+    // Validates credentials and ensures the employee account is active
+    public Employee login(int empid, String password) {
+        logger.info("Login attempt for empId={}", empid);
+        try {
+            // Fetch active employee matching given credentials
+            Employee emp = authDAO.findActiveEmployee(empid, password);
+
+            // If no employee is found, treat it as invalid login
+            if (emp == null) {
+                logger.warn("Invalid login attempt for empId={}", empid);
+                throw new BusinessException("Invalid credentials or inactive account");
             }
-        } catch (Exception e) { e.printStackTrace(); }
-        return null;
+
+            // Successful login returns Employee object
+            return emp;
+
+
+        } catch (SQLException e) {
+            logger.error("Error during login for empId={}", empid, e);
+            // Converts low-level SQL exception into a business-friendly exception
+            throw new BusinessException("System error. Please try again later");
+        }
+
     }
 
+    // Allows employee to change password after validating old password
     public boolean changePassword(int empId, String oldPwd, String newPwd) {
-        String sql = "UPDATE employees SET password=? WHERE emp_id=? AND password=?";
-        try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, newPwd);
-            ps.setInt(2, empId);
-            ps.setString(3, oldPwd);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) { return false; }
+        // Verifies whether the old password matches the stored password
+        boolean valid = authDAO.validateOldPassword(empId, oldPwd);
+
+        // If old password is incorrect, do not proceed
+        if (!valid) {
+            return false;
+        }
+
+        // Updates password with new value
+        return authDAO.updatePassword(empId, newPwd);
     }
 
+    // Resets password directly (used by admin or system-level operation)
     public boolean resetPassword(int empId, String newPwd) {
-        String sql = "UPDATE employees SET password=? WHERE emp_id=?";
-        try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, newPwd);
-            ps.setInt(2, empId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) { return false; }
+        // Updates password without validating old password
+        return authDAO.updatePassword(empId, newPwd);
     }
 }
+

@@ -1,99 +1,127 @@
 package org.example.service;
 
-import org.example.dao.*;
-import org.example.model.Employee;
-import java.util.Scanner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.example.DAO.EmployeeDAO;
+import org.example.DAO.LeaveDAO;
+import org.example.DAO.PerformanceDAO;
+import org.example.DAO.NotificationDAO;
+import org.example.DAO.GoalDAO;
 
+// Service layer for all employee-related operations
+// Coordinates between controllers and multiple DAOs
 public class EmployeeService {
+    private static final Logger logger =
+            LogManager.getLogger(EmployeeService.class);
 
-    EmployeeDAO empDao = new EmployeeDAO();
-    LeaveDAO leaveDao = new LeaveDAO();
-    PerformanceDAO perfDao = new PerformanceDAO();
-    NotificationDAO notifDao = new NotificationDAO();
-    GoalDAO goalDAO=new GoalDAO();
+    // DAO responsible for employee profile and core employee data
+    private final EmployeeDAO empDao = new EmployeeDAO();
 
-    public void menu(Employee emp) throws Exception {
-        Scanner sc = new Scanner(System.in);
-        while (true) {
-            System.out.println("""
-            1.View Profile
-            2.Apply Leave
-            3.View Leaves
-            4.Submit Performance Review
-            5.View Notifications
-            6.Goals
-            7.Update
-            8.View Reporting Manager
-            9.Leave Status
-            10.Cancel Leave
-            11.Holidays
-            12.Set Goals
-            0.Logout
-            """);
+    // DAO responsible for leave-related operations
+    private final LeaveDAO leaveDao = new LeaveDAO();
 
-            int ch = sc.nextInt();
-            sc.nextLine();
+    // DAO responsible for performance review operations
+    private final PerformanceDAO perfDao = new PerformanceDAO();
 
-            switch (ch) {
-                case 1 -> empDao.viewProfile(emp.getId());
-                case 2 -> leaveDao.applyLeave(emp.getId(), "2026-02-01", "2026-02-02", "CL", "Personal");
-                case 3 -> leaveDao.viewLeaves(emp.getId());
-                case 4 -> perfDao.submitReview(emp.getId(), "Tasks done", "Achievements", 4);
-                case 5 -> notifDao.view(emp.getId());
-                case 6 -> goalDAO.viewGoals(emp.getId());
-                case 7 -> empDao.updateProfile(emp.getId(),emp.getPhone(),emp.getAddress(),emp.getEmergency());
-                case 8 -> {
-                    boolean found = empDao.viewReportingManager(emp.getId());
-                    if (!found) {
-                        System.out.println("❌ Reporting manager not assigned");
-                    }
-                }
-                case 9 ->{
-                    boolean found = empDao.viewAppliedLeaves(emp.getId());
+    // DAO responsible for employee notifications
+    private final NotificationDAO notifDao = new NotificationDAO();
 
-                    if (!found) {
-                        System.out.println("ℹ️ No leave applications found");
-                    }
-                }
-                case 10 ->{
-                    System.out.print("Enter Leave Application ID to cancel: ");
-                    int leaveId = Integer.parseInt(sc.nextLine());
-                    boolean success = empDao.cancelPendingLeave(emp.getId(), leaveId);
-                    System.out.println(success
-                            ? "✅ Leave application cancelled successfully"
-                            : "❌ Unable to cancel (Only PENDING leaves can be cancelled)");
-                }
-                case 11 ->{
-                    boolean found = empDao.viewHolidayCalendar();
+    // DAO responsible for employee goals
+    private final GoalDAO goalDao = new GoalDAO();
 
-                    if (!found) {
-                        System.out.println("ℹ️ No holidays configured");
-                    }
-                }
-                case 12 ->{
+    // Fetches and displays employee profile details
+    public void viewProfile(int empId) {
+        logger.info("Viewing profile for empId={}", empId);
+        String msg = empDao.viewProfile(empId);
+        System.out.println(msg);
+    }
 
-                    System.out.print("Goal Description: ");
-                    String description = sc.nextLine();
+    // Applies leave for the given employee and displays result message
+    public void applyLeave(int empId, String from, String to, String type, String reason) {
+        String msg = leaveDao.applyLeave(empId, from, to, type, reason);
+        System.out.println(msg);
+        logger.info("Leave applied by empId={}, from={} to={}", empId, from, to);
+    }
 
-                    System.out.print("Deadline (YYYY-MM-DD): ");
-                    String deadline = sc.nextLine();
+    // Displays all leaves applied by the employee
+    public void viewLeaves(int empId) {
+        String msg = leaveDao.viewLeaves(empId);
+        System.out.println(msg);
+        logger.info("Viewing leaves for empId={}", empId);
+    }
 
-                    System.out.print("Priority: ");
-                    String priority = sc.nextLine();
+    // Submits employee self-performance review details
+    public void submitReview(int empId, String del, String ach, int rating) {
+        logger.info("Performance review submitted by empId={}", empId);
+        String msg = perfDao.submitReview(empId, del, ach, rating);
+        System.out.println(msg);
+    }
 
-                    System.out.print("Success Metrics: ");
-                    String metrics = sc.nextLine();
+    // Fetches and displays employee notifications
+    public void viewNotifications(int empId) {
+        logger.info("Viewing notifications for empId={}", empId);
+        String msg = notifDao.view(empId);
+        System.out.println(msg);
+    }
 
-                    boolean success = empDao.addGoal(
-                            emp.getId(), description, deadline, priority, metrics
-                    );
+    // Displays goals assigned to the employee
+    public void viewGoals(int empId) throws Exception {
+        logger.info("Viewing goals for empId={}", empId);
+        String msg = goalDao.viewGoals(empId);
+        System.out.println(msg);
+    }
 
-                    System.out.println(success
-                            ? "✅ Goal added successfully"
-                            : "❌ Failed to add goal");
-                }
-                case 0 -> { return; }
-            }
-        }
+    // Updates employee profile information
+    public boolean updateProfile(int empId, String phone, String address, String emergency) {
+        // Returns true if update is successful
+        logger.info("Updating profile for empId={}", empId);
+        boolean success = empDao.updateProfile(empId, phone, address, emergency);
+        return success;
+    }
+
+    // Displays reporting manager details for the employee
+    public boolean viewReportingManager(int empId) {
+        logger.info("Viewing reporting manager for empId={}", empId);
+        String msg = empDao.viewReportingManager(empId);
+
+        // If no manager is assigned, return false
+        if (msg == null) return false;
+
+        System.out.println(msg);
+        return true;
+    }
+
+    // Displays applied leaves of the employee
+    public boolean viewAppliedLeaves(int empId) {
+
+        String msg = empDao.viewAppliedLeaves(empId);
+
+        // If no leave records exist, return false
+        if (msg == null) return false;
+
+        System.out.println(msg);
+        return true;
+    }
+
+    // Cancels a pending leave request for the employee
+    public boolean cancelLeave(int empId, int leaveId) {
+        logger.info("Cancel leave requested: empId={}, leaveId={}", empId, leaveId);
+        return empDao.cancelPendingLeave(empId, leaveId);
+    }
+
+    // Displays company holiday calendar
+    public boolean viewHolidayCalendar() {
+        String msg = empDao.viewHolidayCalendar();
+        logger.info("Viewing holiday calendar");
+        // If no holidays are configured, return false
+        if (msg == null) return false;
+
+        System.out.println(msg);
+        return true;
+    }
+
+    // Adds a new goal for the employee
+    public boolean addGoal(int empId, String desc, String deadline, String priority, String metrics) {
+        return empDao.addGoal(empId, desc, deadline, priority, metrics);
     }
 }

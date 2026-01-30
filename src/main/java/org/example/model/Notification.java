@@ -1,6 +1,7 @@
 package org.example.model;
 
 public class Notification {
+    //getters and setters written for this model
     private int empId;
     private String message;
     private boolean isRead;

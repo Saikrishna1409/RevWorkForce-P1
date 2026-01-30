@@ -1,0 +1,25 @@
+2026-01-30 13:49:46 [main] INFO  AuthService - Login attempt for empId=1001
+2026-01-30 13:49:55 [main] INFO  EmployeeService - Viewing profile for empId=1001
+2026-01-30 13:49:55 [main] INFO  EmployeeDAO - Viewed profile for empId=1001
+2026-01-30 13:50:19 [main] INFO  LeaveDAO - Leave applied for empId=1001, rows affected=1
+2026-01-30 13:50:19 [main] INFO  EmployeeService - Leave applied by empId=1001, from=2026-09-06 to=2026-09-10
+2026-01-30 13:50:37 [main] INFO  EmployeeService - Viewing leaves for empId=1001
+2026-01-30 13:50:46 [main] INFO  EmployeeService - Viewing notifications for empId=1001
+2026-01-30 13:50:51 [main] INFO  EmployeeService - Viewing goals for empId=1001
+2026-01-30 13:51:16 [main] INFO  EmployeeService - Updating profile for empId=1001
+2026-01-30 13:51:16 [main] INFO  EmployeeDAO - Updated profile for empId=1001, rows affected=1
+2026-01-30 13:51:44 [main] INFO  EmployeeService - Viewing reporting manager for empId=1001
+2026-01-30 13:52:09 [main] INFO  EmployeeService - Cancel leave requested: empId=1001, leaveId=9
+2026-01-30 13:52:09 [main] INFO  EmployeeDAO - Cancelled pending leave leaveId=9, empId=1001, rows affected=1
+2026-01-30 13:52:16 [main] INFO  EmployeeService - Viewing holiday calendar
+2026-01-30 13:52:39 [main] INFO  AuthService - Login attempt for empId=2001
+2026-01-30 13:52:42 [main] INFO  ManagerService - Viewing reportees for managerId=2001
+2026-01-30 13:52:48 [main] INFO  ManagerService - Viewing team leave requests for managerId=2001
+2026-01-30 13:53:09 [main] INFO  ManagerService - Updating leave status: leaveId=8, status=REJECTED
+2026-01-30 13:53:20 [main] INFO  ManagerService - Viewing team leave summary for managerId=2001
+2026-01-30 13:53:27 [main] INFO  ManagerService - Viewing performance docs for managerId=2001
+2026-01-30 13:54:53 [main] INFO  AuthService - Login attempt for empId=3001
+2026-01-30 13:55:18 [main] INFO  EmployeeDAO - Updated employee empId=1001, rows affected=1
+2026-01-30 13:55:37 [main] INFO  EmployeeDAO - Updated status for empId=1001, rows affected=1
+2026-01-30 13:55:52 [main] INFO  EmployeeDAO - Assigned managerId=2001 to empId=1001, rows affected=1
+2026-01-30 13:56:06 [main] INFO  LeaveDAO - Leave type added/updated type=CL, rows affected=2
